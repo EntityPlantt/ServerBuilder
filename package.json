@@ -1,24 +1,26 @@
 {
-  "name": "server-builder",
-  "description": "Build servers using Node.js and this Electron app.",
-  "bugs": {
-    "url": "https://github.com/EntityPlantt/ServerBuilder/issues"
-  },
-  "repository": {
-    "url": "https://github.com/EntityPlantt/ServerBuilder",
-    "type": "GitHub"
-  },
   "author": {
     "name": "Plantt",
     "url": "https://entityplantt.github.io/"
   },
-  "dependencies": {
-    "node-mihome": "^0.0.32"
+  "bugs": {
+    "url": "https://github.com/EntityPlantt/ServerBuilder/issues"
   },
+  "dependencies": {
+    "electron": "^20.1.3",
+    "electron-packager": "^16.0.0"
+  },
+  "description": "Build servers using Node.js and this Electron app.",
   "license": "CC-BY-ND",
   "main": "app.js",
+  "name": "server-builder",
+  "repository": {
+    "url": "https://github.com/EntityPlantt/ServerBuilder",
+    "type": "GitHub"
+  },
   "scripts": {
     "start": "electron .",
-    "build": "echo 'This command is not declared yet.'"
-  }
+    "build": "call build.bat"
+  },
+  "version": "1.0.0"
 }

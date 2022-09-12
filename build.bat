@@ -1,0 +1,1 @@
+npx electron-packager . ServerBuilder --icon="icon.ico"
