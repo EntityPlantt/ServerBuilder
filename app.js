@@ -11,7 +11,9 @@ function createWindow() {
 		show: false,
 		autoHideMenuBar: true,
 		webPreferences: {
-			preload: join(__dirname, "main.js")
+			preload: join(__dirname, "main.js"),
+			sandbox: false,
+			nodeIntegration: true
 		}
 	});
 	window.loadFile(join(__dirname, "index.html"));

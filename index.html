@@ -6,11 +6,111 @@
 	<title>ServerBuilder</title>
 	<link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
 	<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<style>
+		h1, h2, h3, h4, h5, h6 {
+			user-select: none;
+		}
+		::selection {
+			background: lightgray;
+			color: unset;
+		}
+	</style>
 </head>
 <body>
-	<div class="text-bg-primary p-3">
+	<div class="text-bg-primary p-3 position-fixed w-100">
 		<h3 class="display-3">ServerBuilder</h3>
 	</div>
-	<main class="text-bg-light p-3"></main>
+	<div class="text-bg-light p-3">
+		<h3 class="display-3">ServerBuilder</h3>
+	</div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-3 px-1 text-bg-light position-fixed vh-100">
+				<div class="sticky-top">
+					<div class="nav flex-column">
+						<a class="nav-link" href="#server">Server</a>
+						<a class="nav-link" href="#paths">Paths</a>
+						<a class="nav-link" href="#requests">Requests</a>
+					</div>
+				</div>
+			</div>
+			<div class="col offset-3" id="main">
+				<div id="menu-server">
+					<h1>Server</h1>
+					<table class="table">
+						<thead>
+							<tr>
+								<th scope="col">Property</th>
+								<th scope="col">Value</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Status</td>
+								<td id="show-status">
+									<span class="text-success d-none">Online</span>
+									<span class="text-danger d-none">Offline</span>
+									<span class="text-muted">Loading...</span>
+								</td>
+							</tr>
+							<tr>
+								<td>Port</td>
+								<td><code id="show-port">???</code></td>
+							</tr>
+							<tr>
+								<td>Server time</td>
+								<td id="show-server-time">Checking...</td>
+							</tr>
+							<tr>
+								<td>Total requests</td>
+								<td>
+									<span id="show-server-requests">Checking...</span>
+									<a href="#requests" class="px-1">View all</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<button class="btn btn-success btn-lg" id="start-server-btn" onclick="startServer()">Start</button>
+					<button class="btn btn-danger btn-lg d-none" id="stop-server-btn" onclick="stopServer()">Stop</button>
+				</div>
+				<div id="menu-paths" class="d-none">
+					<h1>Paths</h1>
+				</div>
+				<div id="menu-requests" class="d-none">
+					<h1>Requests</h1>
+					<button type="button" data-bs-toggle="modal" data-bs-target="#reset-requests" class="btn btn-danger">Reset</button>
+					<table class="table">
+						<thead>
+							<tr>
+								<th scope="col">#</th>
+								<th scope="col">Path</th>
+								<th scope="col">IP Address</th>
+								<th scope="col">Time</th>
+							</tr>
+						</thead>
+						<tbody id="server-request-list"></tbody>
+					</table>
+					<em class="text-muted text-center d-block">End of requests</em>
+					<div class="modal fade" tabindex="-1" id="reset-requests">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">Reset requests</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<p>Are you sure you want to delete <b>all</b> logged requests?</p>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+									<button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="resetRequests()">Yes</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
