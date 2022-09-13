@@ -5,7 +5,8 @@ const server = {
 	online: false,
 	server: null,
 	port: parseInt(localStorage.getItem("port") ?? "80"),
-	requests: JSON.parse(localStorage.getItem("requests")) ?? []
+	requests: JSON.parse(localStorage.getItem("requests")) ?? [],
+	paths: JSON.parse(localStorage.getItem("paths")) ?? []
 };
 onhashchange = () => {
 	if (window.location.hash) {
@@ -45,6 +46,18 @@ function frame() {
 	<td>${new Date(req.time)}</td>
 </tr>
 `).join("");
+	document.getElementById("path-cards").innerHTML = server.paths.map(path => `
+<div class="card px-2" style="width:18rem">
+	<div class=card-body>
+		<h5 class="card-title font-monospace">${path.path}</h5>
+		<p class=card-text>${{
+			static: "Static file",
+			code: "Code execution"
+		}[path.type]}</p>
+		<button class="btn btn-secondary">Edit</button>
+	</div>
+</div>
+`);
 }
 onload = frame;
 contextBridge.exposeInMainWorld("resetRequests", () => {
