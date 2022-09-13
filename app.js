@@ -9,12 +9,16 @@ function createWindow() {
 		width: 600,
 		height: 400,
 		show: false,
+		autoHideMenuBar: true,
 		webPreferences: {
 			preload: join(__dirname, "main.js")
 		}
 	});
 	window.loadFile(join(__dirname, "index.html"));
-	window.once("ready-to-show", () => win.show());
+	window.once("ready-to-show", () => {
+		window.maximize();
+		window.show();
+	});
 	return window;
 }
 app.whenReady().then(() => {
@@ -25,3 +29,8 @@ app.whenReady().then(() => {
 		}
 	});
 });
+app.on("window-all-closed", () => {
+	if (process.platform != "darwin") {
+		process.exit();
+	}
+})

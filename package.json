@@ -7,6 +7,7 @@
     "url": "https://github.com/EntityPlantt/ServerBuilder/issues"
   },
   "dependencies": {
+    "bootstrap": "^5.2.0",
     "electron": "^20.1.3",
     "electron-packager": "^16.0.0"
   },
