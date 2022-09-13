@@ -9,7 +9,6 @@ const server = {
 };
 onhashchange = () => {
 	if (window.location.hash) {
-		console.log("Hash change!");
 		document.querySelectorAll("[id^=menu-]").forEach(elm => elm.classList.add("d-none"));
 		document.getElementById("menu-" + window.location.hash.substr(1)).classList.remove("d-none");
 	}
@@ -48,7 +47,6 @@ function frame() {
 `).join("");
 }
 onload = frame;
-onkeydown = () => window.event.preventDefault();
 contextBridge.exposeInMainWorld("resetRequests", () => {
 	server.requests = [];
 });
@@ -67,3 +65,5 @@ contextBridge.exposeInMainWorld("startServer", () => {
 contextBridge.exposeInMainWorld("stopServer", () => {
 	server.server.close(() => void(server.online = false));
 });
+contextBridge.exposeInMainWorld("loadPortToChangingInput", () => document.getElementById("edit-port-input").value = server.port);
+contextBridge.exposeInMainWorld("savePort", () => server.port = parseInt(document.getElementById("edit-port-input").value));

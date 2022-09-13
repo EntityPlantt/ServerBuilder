@@ -55,7 +55,32 @@
 							</tr>
 							<tr>
 								<td>Port</td>
-								<td><code id="show-port">???</code></td>
+								<td>
+									<code id="show-port">???</code>
+									<a href="#" class="px-1" data-bs-toggle="modal" data-bs-target="#edit-port-modal" onclick="void (loadPortToChangingInput()); return false;">Edit</a>
+									<div class="modal fade" id="edit-port-modal" tabindex="-1" aria-hidden="true">
+										<div class="modal-dialog">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h5 class="modal-title">Edit port</h5>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body">
+                                                    <label class="form-label" for="edit-port-input">Change the port number to:</label>
+                                                    <div class="input-group mb-3">
+                                                        <span class="input-group-text">0 &le;</span>
+                                                        <input class="form-control" type="number" min="0" max="65535" step="1" id="edit-port-input" />
+                                                        <span class="input-group-text">&le; 65535</span>
+                                                    </div>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+													<button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="savePort()">Save</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</td>
 							</tr>
 							<tr>
 								<td>Server time</td>
