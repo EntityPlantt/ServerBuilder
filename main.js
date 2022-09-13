@@ -36,8 +36,6 @@ function frame() {
 	document.getElementById("show-server-requests").innerText = server.requests.length;
 	document.getElementById("show-server-time").innerText = Date();
 	document.getElementById("show-port").innerText = server.port;
-	localStorage.setItem("requests", JSON.stringify(server.requests));
-	localStorage.setItem("port", server.port);
 	document.getElementById("server-request-list").innerHTML = server.requests.map((req, index) => `
 <tr>
 	<td scope=row>${server.requests.length - index}</td>
@@ -62,6 +60,7 @@ function frame() {
 onload = frame;
 contextBridge.exposeInMainWorld("resetRequests", () => {
 	server.requests = [];
+	localStorage.removeItem("requests");
 });
 contextBridge.exposeInMainWorld("startServer", () => {
 	server.server = createServer((req, res) => {
@@ -70,6 +69,7 @@ contextBridge.exposeInMainWorld("startServer", () => {
 			ip: res.socket.remoteAddress,
 			path: req.url
 		});
+		localStorage.setItem("requests", JSON.stringify(server.requests));
 		res.writeHead(200);
 		res.end();
 	}).listen(server.port);
@@ -79,4 +79,7 @@ contextBridge.exposeInMainWorld("stopServer", () => {
 	server.server.close(() => void(server.online = false));
 });
 contextBridge.exposeInMainWorld("loadPortToChangingInput", () => document.getElementById("edit-port-input").value = server.port);
-contextBridge.exposeInMainWorld("savePort", () => server.port = parseInt(document.getElementById("edit-port-input").value));
+contextBridge.exposeInMainWorld("savePort", () => {
+	server.port = parseInt(document.getElementById("edit-port-input").value);
+	localStorage.setItem("port", server.port);
+});
