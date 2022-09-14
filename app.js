@@ -1,4 +1,4 @@
-const { BrowserWindow, app, ipcMain, dialog: { showOpenDialogSync } } = require("electron");
+const { BrowserWindow, app, ipcMain, dialog: { showOpenDialogSync, showSaveDialogSync } } = require("electron");
 const { join } = require("path");
 var window = null;
 function createWindow() {
@@ -38,6 +38,9 @@ app.whenReady().then(() => {
 	createWindow();
 	ipcMain.on("open-dialog", (event, options) => {
 		event.reply("path-dialog-finish", showOpenDialogSync(window, options));
+	});
+	ipcMain.on("save-dialog", (event, options) => {
+		event.reply("path-dialog-finish", showSaveDialogSync(window, options));
 	});
 	app.on("activate", () => {
 		if (!BrowserWindow.getAllWindows().length) {

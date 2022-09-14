@@ -1,7 +1,7 @@
 const { contextBridge: { exposeInMainWorld }, ipcRenderer } = require("electron");
 const { getMaterialFileIcon } = require("file-extension-icon-js");
 const { createServer } = require("http");
-const Blockly = require("blockly");
+const { injectBlockly } = require("./blockly-injection.js");
 
 const server = {
 	online: false,
@@ -81,7 +81,7 @@ function savePaths() {
 	localStorage.setItem("paths", JSON.stringify(server.paths));
 	document.getElementById("path-cards").innerHTML = server.paths.map((path, index) => `
 <div class="card px-2 m-2 d-inline-block" style="width:18rem">
-	<img class=card-img-top src="${{
+	<img class=card-img-top height=150 src="${{
 		static() { return getMaterialFileIcon(path.filepath) },
 		code() { return ""; }
 	}[path.type]()}">
@@ -124,6 +124,7 @@ exposeInMainWorld("openEditor", index => {
 	else {
 		document.getElementById("edit-static-path-dialog").classList.add("d-none");
 		document.getElementById("edit-code-path-dialog").classList.remove("d-none");
+		injectBlockly(document.getElementById("edit-code-path-editor"), server.paths[index].workspace);
 	}
 });
 exposeInMainWorld("deletePath", index => {
