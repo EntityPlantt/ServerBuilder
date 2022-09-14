@@ -10,7 +10,8 @@
     "blockly": "^8.0.5",
     "bootstrap": "^5.2.0",
     "electron": "^20.1.3",
-    "electron-packager": "^16.0.0"
+    "electron-packager": "^16.0.0",
+    "file-extension-icon-js": "^1.1.6"
   },
   "description": "Build servers using Node.js and this Electron app.",
   "license": "CC-BY-ND",

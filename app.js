@@ -1,4 +1,4 @@
-const { BrowserWindow, app } = require("electron");
+const { BrowserWindow, app, ipcMain, dialog: { showOpenDialogSync } } = require("electron");
 const { join } = require("path");
 var window = null;
 function createWindow() {
@@ -36,6 +36,9 @@ function createWindow() {
 }
 app.whenReady().then(() => {
 	createWindow();
+	ipcMain.on("open-dialog", (event, options) => {
+		event.reply("path-dialog-finish", showOpenDialogSync(window, options));
+	});
 	app.on("activate", () => {
 		if (!BrowserWindow.getAllWindows().length) {
 			createWindow();
@@ -46,4 +49,4 @@ app.on("window-all-closed", () => {
 	if (process.platform != "darwin") {
 		process.exit();
 	}
-})
+});

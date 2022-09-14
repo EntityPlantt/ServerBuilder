@@ -1,4 +1,5 @@
-const { contextBridge } = require("electron");
+const { contextBridge: { exposeInMainWorld }, ipcRenderer } = require("electron");
+const { getMaterialFileIcon } = require("file-extension-icon-js");
 const { createServer } = require("http");
 const Blockly = require("blockly");
 
@@ -21,19 +22,27 @@ onhashchange = () => {
 document.reques
 function frame() {
 	requestAnimationFrame(frame);
-	if (server.online) {
+	if (server.online == true) {
 		document.querySelector("#show-status .text-success").classList.remove("d-none");
 		document.querySelector("#show-status .text-danger").classList.add("d-none");
+		document.querySelector("#show-status .text-muted").classList.add("d-none");
 		document.getElementById("start-server-btn").classList.add("d-none");
 		document.getElementById("stop-server-btn").classList.remove("d-none");
 	}
-	else {
+	else if (server.online == false) {
 		document.querySelector("#show-status .text-success").classList.add("d-none");
 		document.querySelector("#show-status .text-danger").classList.remove("d-none");
+		document.querySelector("#show-status .text-muted").classList.add("d-none");
 		document.getElementById("start-server-btn").classList.remove("d-none");
 		document.getElementById("stop-server-btn").classList.add("d-none");
 	}
-	document.querySelector("#show-status .text-muted").classList.add("d-none");
+	else {
+		document.querySelector("#show-status .text-success").classList.add("d-none");
+		document.querySelector("#show-status .text-danger").classList.add("d-none");
+		document.querySelector("#show-status .text-muted").classList.remove("d-none");
+		document.getElementById("start-server-btn").classList.add("d-none");
+		document.getElementById("stop-server-btn").classList.add("d-none");
+	}
 	document.getElementById("show-server-requests").innerText = server.requests.length;
 	document.getElementById("show-server-time").innerText = Date();
 	document.getElementById("show-port").innerText = server.port;
@@ -50,11 +59,12 @@ onload = () => {
 	savePaths();
 	frame();
 };
-contextBridge.exposeInMainWorld("resetRequests", () => {
+exposeInMainWorld("resetRequests", () => {
 	server.requests = [];
 	localStorage.removeItem("requests");
 });
-contextBridge.exposeInMainWorld("startServer", () => {
+exposeInMainWorld("startServer", () => {
+	server.online = null;
 	server.server = createServer((req, res) => {
 		server.requests.unshift({
 			time: new Date().getTime(),
@@ -71,6 +81,10 @@ function savePaths() {
 	localStorage.setItem("paths", JSON.stringify(server.paths));
 	document.getElementById("path-cards").innerHTML = server.paths.map((path, index) => `
 <div class="card px-2 m-2 d-inline-block" style="width:18rem">
+	<img class=card-img-top src="${{
+		static() { return getMaterialFileIcon(path.filepath) },
+		code() { return ""; }
+	}[path.type]()}">
 	<div class=card-body>
 		<h5 class="card-title font-monospace">${path.path}</h5>
 		<p class=card-text>${{
@@ -82,15 +96,16 @@ function savePaths() {
 </div>
 `).join("");
 }
-contextBridge.exposeInMainWorld("stopServer", () => {
+exposeInMainWorld("stopServer", () => {
+	server.online = null;
 	server.server.close(() => void(server.online = false));
 });
-contextBridge.exposeInMainWorld("loadPortToChangingInput", () => document.getElementById("edit-port-input").value = server.port);
-contextBridge.exposeInMainWorld("savePort", () => {
+exposeInMainWorld("loadPortToChangingInput", () => document.getElementById("edit-port-input").value = server.port);
+exposeInMainWorld("savePort", () => {
 	server.port = parseInt(document.getElementById("edit-port-input").value);
 	localStorage.setItem("port", server.port);
 });
-contextBridge.exposeInMainWorld("createNewPath", () => {
+exposeInMainWorld("createNewPath", () => {
 	const path = {
 		path: "/" + document.getElementById("new-path-path").value,
 		type: document.querySelector("[name=new-path-type]:checked").getAttribute("data-value")
@@ -98,11 +113,20 @@ contextBridge.exposeInMainWorld("createNewPath", () => {
 	server.paths.push(path);
 	savePaths();
 });
-contextBridge.exposeInMainWorld("openEditor", index => {
+exposeInMainWorld("openEditor", index => {
 	document.getElementById("save-path-btn").setAttribute("onclick", `savePath(${index})`);
 	document.getElementById("delete-path-btn").setAttribute("onclick", `deletePath(${index})`);
+	if (server.paths[index].type == "static") {
+		document.getElementById("edit-static-path-dialog").classList.remove("d-none");
+		document.getElementById("edit-code-path-dialog").classList.add("d-none");
+		document.getElementById("edit-static-path-filepath").value = server.paths[index].filepath ?? "";
+	}
+	else {
+		document.getElementById("edit-static-path-dialog").classList.add("d-none");
+		document.getElementById("edit-code-path-dialog").classList.remove("d-none");
+	}
 });
-contextBridge.exposeInMainWorld("deletePath", index => {
+exposeInMainWorld("deletePath", index => {
 	if (document.getElementById("delete-path-btn").innerText == "Delete") {
 		setTimeout(() => {
 			document.getElementById("delete-path-btn").innerText = "Confirm delete";
@@ -116,5 +140,23 @@ contextBridge.exposeInMainWorld("deletePath", index => {
 	else {
 		server.paths.splice(index, 1);
 		savePaths();
-    }
+	}
+});
+exposeInMainWorld("savePath", index => {
+	server.paths[index].filepath = document.getElementById("edit-static-path-filepath").value;
+	savePaths();
+});
+exposeInMainWorld("chooseStaticPathFilepath", () => {
+	ipcRenderer.once("path-dialog-finish", (_event, path) => {
+		if (path) {
+			document.getElementById("edit-static-path-filepath").value = path;
+		}
+	});
+	ipcRenderer.send("open-dialog", {
+		title: "Select filepath",
+		defaultPath: document.getElementById("edit-static-path-filepath").value,
+		buttonLabel: "Select",
+		filters: [{name: "File", extensions: ["*"]}],
+		properties: ["openFile", "dontAddToRecent"]
+	});
 });

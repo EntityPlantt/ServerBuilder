@@ -115,11 +115,26 @@
 									</div>Type
 									<div class="form-check">
 										<input class="form-check-input" type="radio" name="new-path-type" id="new-path-type-static" data-value="static" checked />
-										<label class="form-check-label" for="new-path-type-static">Static file</label>
+										<label class="form-check-label" for="new-path-type-static">
+											Static file
+											<br />
+											<span class="text-muted">
+												When requesting that address, takes a file on the computer and sends it.
+												Every time, the same response. <span class="text-warning">Does not cache.</span>
+											</span>
+										</label>
 									</div>
 									<div class="form-check">
 										<input class="form-check-input" type="radio" name="new-path-type" id="new-path-type-code" data-value="code" />
-										<label class="form-check-label" for="new-path-type-code">Code execution</label>
+										<label class="form-check-label" for="new-path-type-code">
+											Code execution
+											<br />
+											<span class="text-muted">
+												When requesting that address, the server executes JavaScript backend code to
+												calculate the response. You're going to code that calculation with Blockly.
+												<span class="text-warning">Does not cache.</span>
+											</span>
+										</label>
 									</div>
 								</div>
 								<div class="modal-footer">
@@ -137,8 +152,18 @@
 									<h5 class="modal-title">Edit path</h5>
 									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 								</div>
-								<div class="modal-body">
-									//
+								<div class="modal-body" id="edit-static-path-dialog">
+									Type: <span class="text-primary">Static file</span>
+									<hr />
+									<label class="form-label" for="edit-static-path-filepath">File path:</label>
+									<div class="input-group">
+										<span class="input-group-text font-monospace">.\</span>
+										<input id="edit-static-path-filepath" class="form-control font-monospace" type="text" placeholder="C:\Users\Default\Documents\GitHub\repo\README.md" />
+										<button class="btn btn-secondary" onclick="chooseStaticPathFilepath()">Browse</button>
+									</div>
+								</div>
+								<div class="modal-body" id="edit-code-path-dialog">
+									Type: <span class="text-primary">Code execution</span>
 								</div>
 								<div class="modal-footer">
 									<button type="button" class="btn btn-danger" id="delete-path-btn">Delete</button>
