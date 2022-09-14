@@ -1,5 +1,6 @@
 const { contextBridge } = require("electron");
 const { createServer } = require("http");
+const Blockly = require("blockly");
 
 const server = {
 	online: false,
@@ -44,20 +45,11 @@ function frame() {
 	<td>${new Date(req.time)}</td>
 </tr>
 `).join("");
-	document.getElementById("path-cards").innerHTML = server.paths.map(path => `
-<div class="card px-2" style="width:18rem">
-	<div class=card-body>
-		<h5 class="card-title font-monospace">${path.path}</h5>
-		<p class=card-text>${{
-			static: "Static file",
-			code: "Code execution"
-		}[path.type]}</p>
-		<button class="btn btn-secondary">Edit</button>
-	</div>
-</div>
-`);
 }
-onload = frame;
+onload = () => {
+	savePaths();
+	frame();
+};
 contextBridge.exposeInMainWorld("resetRequests", () => {
 	server.requests = [];
 	localStorage.removeItem("requests");
@@ -75,6 +67,21 @@ contextBridge.exposeInMainWorld("startServer", () => {
 	}).listen(server.port);
 	server.server.on("listening", () => server.online = true);
 });
+function savePaths() {
+	localStorage.setItem("paths", JSON.stringify(server.paths));
+	document.getElementById("path-cards").innerHTML = server.paths.map((path, index) => `
+<div class="card px-2 m-2 d-inline-block" style="width:18rem">
+	<div class=card-body>
+		<h5 class="card-title font-monospace">${path.path}</h5>
+		<p class=card-text>${{
+			static: "Static file",
+			code: "Code execution"
+		}[path.type]}</p>
+		<button class="btn btn-secondary" onclick="openEditor(${index})" data-bs-toggle=modal data-bs-target=#edit-path-modal>Edit</button>
+	</div>
+</div>
+`).join("");
+}
 contextBridge.exposeInMainWorld("stopServer", () => {
 	server.server.close(() => void(server.online = false));
 });
@@ -82,4 +89,32 @@ contextBridge.exposeInMainWorld("loadPortToChangingInput", () => document.getEle
 contextBridge.exposeInMainWorld("savePort", () => {
 	server.port = parseInt(document.getElementById("edit-port-input").value);
 	localStorage.setItem("port", server.port);
+});
+contextBridge.exposeInMainWorld("createNewPath", () => {
+	const path = {
+		path: "/" + document.getElementById("new-path-path").value,
+		type: document.querySelector("[name=new-path-type]:checked").getAttribute("data-value")
+	};
+	server.paths.push(path);
+	savePaths();
+});
+contextBridge.exposeInMainWorld("openEditor", index => {
+	document.getElementById("save-path-btn").setAttribute("onclick", `savePath(${index})`);
+	document.getElementById("delete-path-btn").setAttribute("onclick", `deletePath(${index})`);
+});
+contextBridge.exposeInMainWorld("deletePath", index => {
+	if (document.getElementById("delete-path-btn").innerText == "Delete") {
+		setTimeout(() => {
+			document.getElementById("delete-path-btn").innerText = "Confirm delete";
+			document.getElementById("delete-path-btn").setAttribute("data-bs-dismiss", "modal");
+		}, 100);
+		setTimeout(() => {
+			document.getElementById("delete-path-btn").innerText = "Delete";
+			document.getElementById("delete-path-btn").removeAttribute("data-bs-dismiss");
+		}, 1000);
+	}
+	else {
+		server.paths.splice(index, 1);
+		savePaths();
+    }
 });

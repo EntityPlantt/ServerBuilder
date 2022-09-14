@@ -59,19 +59,18 @@
 									<code id="show-port">???</code>
 									<a href="#" class="px-1" data-bs-toggle="modal" data-bs-target="#edit-port-modal" onclick="void (loadPortToChangingInput()); return false;">Edit</a>
 									<div class="modal fade" id="edit-port-modal" tabindex="-1" aria-hidden="true">
-										<div class="modal-dialog">
+										<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
 											<div class="modal-content">
 												<div class="modal-header">
 													<h5 class="modal-title">Edit port</h5>
 													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 												</div>
 												<div class="modal-body">
-                                                    <label class="form-label" for="edit-port-input">Change the port number to:</label>
-                                                    <div class="input-group mb-3">
-                                                        <span class="input-group-text">0 &le;</span>
-                                                        <input class="form-control" type="number" min="0" max="65535" step="1" id="edit-port-input" />
-                                                        <span class="input-group-text">&le; 65535</span>
-                                                    </div>
+													<label class="form-label" for="edit-port-input">Change the port number to:</label>
+													<div class="input-group mb-3 font-monospace">
+														<span class="input-group-text">http://localhost:</span>
+														<input class="form-control" type="number" min="0" max="65535" step="1" id="edit-port-input" />
+													</div>
 												</div>
 												<div class="modal-footer">
 													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -100,7 +99,55 @@
 				</div>
 				<div id="menu-paths" class="d-none">
 					<h1>Paths</h1>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#new-path-modal">New path</button>
+					<div class="modal fade" id="new-path-modal" tabindex="-1" aria-hidden="true" aria-labelledby="new-path-modal-label">
+						<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="new-path-modal-label">New path</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<label class="form-label" for="new-path-path">Path</label>
+									<div class="input-group font-monospace mb-3">
+										<span class="input-group-text">http://localhost/</span>
+										<input class="form-control" id="new-path-path" type="text" placeholder="path/*/matcher.html" />
+									</div>Type
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="new-path-type" id="new-path-type-static" data-value="static" checked />
+										<label class="form-check-label" for="new-path-type-static">Static file</label>
+									</div>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="new-path-type" id="new-path-type-code" data-value="code" />
+										<label class="form-check-label" for="new-path-type-code">Code execution</label>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									<button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="createNewPath()">Create</button>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div id="path-cards"></div>
+					<div class="modal fade" id="edit-path-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+						<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">Edit path</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									//
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-danger" id="delete-path-btn">Delete</button>
+									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									<button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="save-path-btn">Save</button>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 				<div id="menu-requests" class="d-none">
 					<h1>Requests</h1>
@@ -118,7 +165,7 @@
 					</table>
 					<em class="text-muted text-center d-block">End of requests</em>
 					<div class="modal fade" tabindex="-1" id="reset-requests">
-						<div class="modal-dialog">
+						<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
 							<div class="modal-content">
 								<div class="modal-header">
 									<h5 class="modal-title">Reset requests</h5>

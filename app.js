@@ -6,10 +6,21 @@ function createWindow() {
 		window.destroy();
 	}
 	window = new BrowserWindow({
-		width: 600,
-		height: 400,
+		width: 1000,
+		height: 750,
 		show: false,
 		autoHideMenuBar: true,
+		center: true,
+		fullscreenable: false,
+		title: "ServerBuilder",
+		acceptFirstMouse: true,
+		disableAutoHideCursor: true,
+		backgroundColor: "#0d6efd",
+		titleBarOverlay: {
+			color: "#0d6efd",
+			symbolColor: "white",
+			height: 5
+        },
 		webPreferences: {
 			preload: join(__dirname, "main.js"),
 			sandbox: false,
