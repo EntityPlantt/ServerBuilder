@@ -1,7 +1,7 @@
 const { contextBridge: { exposeInMainWorld }, ipcRenderer } = require("electron");
 const { getMaterialFileIcon } = require("file-extension-icon-js");
 const { createServer } = require("http");
-const { injectBlockly } = require("./blockly-injection.js");
+const { injectBlockly, setBlocklyXml, passBlockly } = require("./blockly-injection.js");
 
 const server = {
 	online: false,
@@ -58,6 +58,10 @@ function frame() {
 onload = () => {
 	savePaths();
 	frame();
+	onhashchange();
+	passBlockly(window.Blockly);
+	injectBlockly(document.getElementById("edit-code-path-editor"));
+	dispatchEvent(new Event("resize"));
 };
 exposeInMainWorld("resetRequests", () => {
 	server.requests = [];
@@ -82,7 +86,7 @@ function savePaths() {
 	document.getElementById("path-cards").innerHTML = server.paths.map((path, index) => `
 <div class="card px-2 m-2 d-inline-block" style="width:18rem">
 	<img class=card-img-top height=150 src="${{
-		static() { return getMaterialFileIcon(path.filepath) },
+		static() { return getMaterialFileIcon(path.filepath ?? "") },
 		code() { return ""; }
 	}[path.type]()}">
 	<div class=card-body>
@@ -114,8 +118,11 @@ exposeInMainWorld("createNewPath", () => {
 	savePaths();
 });
 exposeInMainWorld("openEditor", index => {
-	document.getElementById("save-path-btn").setAttribute("onclick", `savePath(${index})`);
-	document.getElementById("delete-path-btn").setAttribute("onclick", `deletePath(${index})`);
+	document.getElementById("save-path-btn").onclick = () => {
+		server.paths[index].filepath = document.getElementById("edit-static-path-filepath").value;
+		savePaths();
+	};
+	document.getElementById("delete-path-btn").onclick = () => window.deletePath(index);
 	if (server.paths[index].type == "static") {
 		document.getElementById("edit-static-path-dialog").classList.remove("d-none");
 		document.getElementById("edit-code-path-dialog").classList.add("d-none");
@@ -124,7 +131,7 @@ exposeInMainWorld("openEditor", index => {
 	else {
 		document.getElementById("edit-static-path-dialog").classList.add("d-none");
 		document.getElementById("edit-code-path-dialog").classList.remove("d-none");
-		injectBlockly(document.getElementById("edit-code-path-editor"), server.paths[index].workspace);
+		setBlocklyXml(server.paths[index].workspace || "<xml xmlns='https://developers.google.com/blockly/xml'></xml>");
 	}
 });
 exposeInMainWorld("deletePath", index => {
@@ -142,10 +149,6 @@ exposeInMainWorld("deletePath", index => {
 		server.paths.splice(index, 1);
 		savePaths();
 	}
-});
-exposeInMainWorld("savePath", index => {
-	server.paths[index].filepath = document.getElementById("edit-static-path-filepath").value;
-	savePaths();
 });
 exposeInMainWorld("chooseStaticPathFilepath", () => {
 	ipcRenderer.once("path-dialog-finish", (_event, path) => {
